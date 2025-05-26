@@ -1,33 +1,43 @@
 {{ define "main" }}
-<div class="series-page-container">
-  <div class="max-w-4xl mx-auto px-6 py-12">
-    
-    <!-- Series header with content -->
-    <div class="series-header">
-      <h1 class="series-page-title">{{ .Title }}</h1>
-      <div class="series-description">
-        {{ .Content }}
-      </div>
-    </div>
-    
-    <!-- Posts in this series -->
-    <section class="series-posts-section">
-      <div class="series-posts-list">
-        {{ range .Pages.ByDate.Reverse }}
-        <div class="series-post-item">
-          <span class="post-date">{{ .Date.Format "Jan 02, 2006" }}</span>
-          <span class="post-separator">:</span>
-          <a href="{{ .RelPermalink }}" class="post-link">{{ .Url }}</a>
-        </div>
-        {{ end }}
-      </div>
-    </section>
-    
-    <!-- Back to blog link -->
-    <div class="back-link">
-      <a href="/blog" class="back-to-blog">← Back to Blog</a>
-    </div>
-    
+<article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  
+  <!-- Page header -->
+  <header class="page-header mb-8 border-b pb-4">
+    <h1 class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">{{ .Title }}</h1>
+    {{ if not .Date.IsZero }} <!-- Check if Date is set -->
+    <time class="text-sm text-gray-500 dark:text-gray-400 font-mono">{{ .Date.Format "January 2, 2006" }}</time>
+    {{ end }}
+  </header>
+  
+  <!-- Page content -->
+  <div class="prose prose-lg dark:prose-invert max-w-none">
+    {{ .Content }}
   </div>
-</div>
+  
+  <!-- Navigation (similar to _default/single.html) -->
+  {{ if or .NextInSection .PrevInSection }}
+  <nav class="mt-12 flex justify-between border-t pt-6">
+    <div>
+      {{ if .PrevInSection }}
+      <a href="{{ .PrevInSection.RelPermalink }}" class="text-blue-600 dark:text-blue-400 hover:underline">
+        <span class="text-xl">←</span> {{ .PrevInSection.Title }}
+      </a>
+      {{ end }}
+    </div>
+    <div>
+      {{ if .NextInSection }}
+      <a href="{{ .NextInSection.RelPermalink }}" class="text-blue-600 dark:text-blue-400 hover:underline">
+        {{ .NextInSection.Title }} <span class="text-xl">→</span>
+      </a>
+      {{ end }}
+    </div>
+  </nav>
+  {{ end }}
+  
+  <!-- Back to blog link (optional, if desired for blog posts) -->
+  <div class="mt-8 text-center">
+    <a href="{{ (.Site.GetPage "section" "blog").RelPermalink }}" class="text-blue-600 dark:text-blue-400 hover:underline">← Back to Blog</a>
+  </div>
+
+</article>
 {{ end }} 
