@@ -1,4 +1,29 @@
 baseURL = 'https://example.org/'
 languageCode = 'en-us'
-title = 'My New Hugo Site'
+title = 'thisisamank'
 theme = 'minimal-thisisamank'
+
+[[menu.main]]
+  name = "Home"
+  url = "/"
+  weight = 10
+
+[[menu.main]]
+  name = "Blog"
+  url = "/blog/"
+  weight = 20
+
+[[menu.main]]
+  name = "Shelf"
+  url = "/shelf/"
+  weight = 30
+
+[[menu.main]]
+  name = "Projects"
+  url = "/projects/"
+  weight = 60
+
+[[menu.main]]
+  name = "About"
+  url = "/about/"
+  weight = 70

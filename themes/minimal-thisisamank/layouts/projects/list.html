@@ -1,0 +1,54 @@
+{{ define "main" }}
+<div class="max-w-4xl mx-auto px-6 py-8">
+  
+  <!-- Projects header -->
+  <header class="page-header">
+    <h1 class="page-title">Projects</h1>
+  </header>
+  
+  <!-- Content from _index.md -->
+  <div class="page-content mb-6 prose max-w-none">
+    {{ .Content }}
+  </div>
+  
+  <!-- Projects list -->
+  <section class="content-section">
+    <div class="space-y-12">
+      {{ range where .Pages.ByDate.Reverse ".Params.draft" "!=" true }}
+      <article class="pb-8 border-b border-gray-100 last:border-b-0 last:pb-0">
+        <h2 class="text-xl font-sans font-semibold text-gray-900 mb-3">
+          <a href="{{ .RelPermalink }}" class="hover:text-gray-600 transition-colors duration-200">{{ .Title }} project slihfhdf</a>
+        </h2>
+        
+        {{ if .Params.tags }}
+        <div class="flex flex-wrap gap-2 mb-4">
+          {{ range .Params.tags }}
+          <span class="inline-block bg-gray-50 text-gray-600 text-xs px-2 py-1 rounded font-mono">{{ . }}</span>
+          {{ end }}
+        </div>
+        {{ end }}
+        
+        {{ if .Params.status }}
+        <div class="mb-3">
+          <span class="text-sm text-gray-600 font-serif">Status: 
+            <span class="font-medium 
+              {{ if eq .Params.status "completed" }}text-green-600{{ end }}
+              {{ if eq .Params.status "in-progress" }}text-blue-600{{ end }}
+              {{ if eq .Params.status "planning" }}text-yellow-600{{ end }}
+            ">{{ .Params.status | title }}</span>
+          </span>
+        </div>
+        {{ end }}
+        
+        {{ if .Summary }}
+        <p class="font-serif text-gray-700 leading-relaxed mb-3">{{ .Summary }}</p>
+        {{ end }}
+        
+        <div class="text-sm text-gray-500 font-mono">{{ .Date.Format "January 2, 2006" }}</div>
+      </article>
+      {{ end }}
+    </div>
+  </section>
+  
+</div>
+{{ end }} 

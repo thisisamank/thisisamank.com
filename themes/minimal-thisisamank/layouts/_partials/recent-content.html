@@ -1,0 +1,65 @@
+<section class="recent-content">
+  <div class="max-w-6xl mx-auto px-6 py-16">      
+      <!-- Recent blog posts -->
+      <div class="recent-section">
+        <div class="section-header">
+          <h2 class="section-title">Recent blog posts</h2>
+          <a href="/blog" class="archive-link">Full archive →</a>
+        </div>
+        <p class="section-description">Things I have written recently.</p>
+        
+        <ul class="content-list">
+          {{ range first 10 (where (where site.RegularPages "Section" "blog") "Kind" "page").ByDate.Reverse }}
+          <li class="content-item">
+            <span class="content-date">{{ .Date.Format "Jan 02, 2006" }}</span>
+            <span class="content-separator">:</span>
+            <a href="{{ .RelPermalink }}" class="content-link">{{ .Title }}</a>
+          </li>
+          {{ end }}
+        </ul>
+      </div>
+      
+      <!-- Recent projects -->
+      <div class="recent-section">
+        <div class="section-header">
+          <h2 class="section-title">Recent projects</h2>
+          <a href="/projects" class="archive-link">All projects →</a>
+        </div>
+        <p class="section-description">Projects I am working on.</p>
+        
+        <ul class="content-list">
+          {{ $projects := where site.RegularPages "Section" "projects" }}
+          {{ range first 8 $projects }}
+          <li class="content-item">
+            <a href="{{ .RelPermalink }}" class="content-link">{{ .Title }}</a>
+          </li>
+          {{ else }}
+          <!-- Fallback content if no projects exist -->
+          <li class="content-item">
+            <a href="#" class="content-link">Distributed Cache System</a>
+          </li>
+          <li class="content-item">
+            <a href="#" class="content-link">Personal Knowledge Management Tool</a>
+          </li>
+          <li class="content-item">
+            <a href="#" class="content-link">Microservices Monitoring Dashboard</a>
+          </li>
+          <li class="content-item">
+            <a href="#" class="content-link">GraphQL API Gateway</a>
+          </li>
+          <li class="content-item">
+            <a href="#" class="content-link">Real-time Analytics Engine</a>
+          </li>
+          <li class="content-item">
+            <a href="#" class="content-link">Machine Learning Pipeline</a>
+          </li>
+          <li class="content-item">
+            <a href="#" class="content-link">Cloud Infrastructure Automation</a>
+          </li>
+          {{ end }}
+        </ul>
+      </div>
+      
+    </div>
+  </div>
+</section> 

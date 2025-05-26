@@ -1,2 +1,19 @@
-<h1>{{ site.Title }}</h1>
-{{ partial "menu.html" (dict "menuID" "main" "page" .) }}
+<nav class="flex items-center justify-between px-6 py-6 bg-white">
+  <!-- Empty left space for balance -->
+  <div class="flex-1"></div>
+  
+  <!-- Center logo -->
+  <div class="flex-1 text-center">
+    <a href="/" class="logo-link">thisisamank</a>
+  </div>
+  
+  <!-- Right navigation -->
+  <div class="flex-1 flex items-center justify-end space-x-8">
+    {{ $currentPage := . }}
+    {{ range site.Menus.main }}
+      {{ if ne .Name "Home" }}
+        <a href="{{ .URL }}" class="nav-link {{ if $currentPage.IsMenuCurrent .Menu . }}active{{ end }}">{{ .Name }}</a>
+      {{ end }}
+    {{ end }}
+  </div>
+</nav>

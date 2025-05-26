@@ -1,10 +1,31 @@
 {{ define "main" }}
-  <h1>{{ .Title }}</h1>
+<div class="max-w-4xl mx-auto px-6 py-8">
 
-  {{ $dateMachine := .Date | time.Format "2006-01-02T15:04:05-07:00" }}
-  {{ $dateHuman := .Date | time.Format ":date_long" }}
-  <time datetime="{{ $dateMachine }}">{{ $dateHuman }}</time>
+  <!-- Page header -->
+  <header class="page-header">
+    <h1 class="page-title">{{ .Title }}</h1>
+    {{ if not .Date.IsZero }}
+      {{ $dateMachine := .Date | time.Format "2006-01-02T15:04:05-07:00" }}
+      {{ $dateHuman := .Date | time.Format ":date_long" }}
+      <div class="mt-1">
+        <time datetime="{{ $dateMachine }}" class="text-xs text-gray-500 dark:text-gray-400 font-mono">{{ $dateHuman }}</time>
+      </div>
+    {{ end }}
+  </header>
 
-  {{ .Content }}
-  {{ partial "terms.html" (dict "taxonomy" "tags" "page" .) }}
+  <!-- Page content -->
+  <div class="prose prose-lg dark:prose-invert max-w-none mt-6">
+    {{ .Content }}
+  </div>
+  
+  <!-- Terms (e.g., Tags) -->
+  {{ $terms := .GetTerms "tags" }}
+  {{ if $terms }}
+  <div class="mt-8 pt-4 border-t">
+    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Tags:</h3>
+    {{ partial "terms.html" (dict "taxonomy" "tags" "page" .) }}
+  </div>
+  {{ end }}
+
+</div>
 {{ end }}

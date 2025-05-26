@@ -1,21 +1,29 @@
 baseURL = 'https://example.org/'
 languageCode = 'en-US'
-title = 'My New Hugo Site'
+title = 'Knowledge Hub'
+
+[taxonomies]
+  tag = "tags"
 
 [menus]
   [[menus.main]]
     name = 'Home'
     pageRef = '/'
+    weight = 5
+
+  [[menus.main]]
+    name = 'Blog'
+    pageRef = '/blog'
     weight = 10
 
   [[menus.main]]
-    name = 'Posts'
-    pageRef = '/posts'
+    name = 'Projects'
+    pageRef = '/projects'
     weight = 20
 
   [[menus.main]]
-    name = 'Tags'
-    pageRef = '/tags'
+    name = 'About'
+    pageRef = '/about'
     weight = 30
 
 [module]

@@ -1,0 +1,47 @@
+{{ define "main" }}
+<div class="max-w-4xl mx-auto px-6 py-8">
+  
+  <!-- Blog header -->
+  <header class="page-header">
+    <h1 class="page-title">Blog</h1>
+  </header>
+  
+  <!-- Series section -->
+  <section class="content-section">
+    <h2 class="section-title">Series</h2>
+    
+    <div class="space-y-8">
+      {{ range .Sections }}
+      <div class="series-item">
+        <h3 class="series-title">{{ .Title }}</h3>
+        <div class="space-y-2">
+          {{ range .RegularPages.ByDate.Reverse }}
+          <div class="post-item">
+            <span class="post-date">{{ .Date.Format "Jan 02, 2006" }}</span>
+            <span class="hidden sm:inline text-gray-500">:</span>
+            <a href="{{ .RelPermalink }}" class="post-link">{{ .Title }}</a>
+          </div>
+          {{ end }}
+        </div>
+      </div>
+      {{ end }}
+    </div>
+  </section>
+  
+  <!-- Posts section -->
+  <section class="content-section">
+    <h2 class="section-title">Posts</h2>
+    
+    <div class="space-y-3">
+      {{ range .RegularPages.ByDate.Reverse }}
+      <div class="post-item">
+        <span class="post-date">{{ .Date.Format "Jan 02, 2006" }}</span>
+        <span class="hidden sm:inline text-gray-500">:</span>
+        <a href="{{ .RelPermalink }}" class="post-link">{{ .Title }}</a>
+      </div>
+      {{ end }}
+    </div>
+  </section>
+  
+</div>
+{{ end }} 

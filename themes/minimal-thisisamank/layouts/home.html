@@ -1,7 +1,91 @@
 {{ define "main" }}
-  {{ .Content }}
-  {{ range site.RegularPages }}
-    <h2><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></h2>
-    {{ .Summary }}
-  {{ end }}
+<div class="max-w-2xl mx-auto px-4 py-16">
+  
+  <!-- Hero section -->
+  <div class="text-center mb-20">
+    <h1 class="text-4xl md:text-5xl font-sans font-bold text-gray-900 mb-6 leading-tight">Welcome to my personal website</h1>
+    <p class="text-md text-center font-serif text-gray-600 leading-relaxed">
+      Here, I share my thoughts, learnings, and projects as an engineer. 
+      Explore the notes for organized content and projects for my latest work.
+    </p>
+  </div>
+
+  <!-- Content Area -->
+  <div class="grid grid-cols-1 gap-12">
+    
+    <!-- Recent blog posts -->
+    <div class="content-section text-left">
+      <div class="flex flex-col mb-4 items-center">
+        <h2 class="section-title mb-0 text-left">Recent blog posts</h2>
+        <a href="/blog" class="font-serif text-gray-600 hover:text-secondary hover:text-opacity-75 transition-colors duration-200 text-sm italic">Full archive →</a>
+      </div>
+      <p class="section-description">Things I have written recently.</p>
+      
+      <div class="space-y-3">
+        {{ range first 10 (where site.RegularPages "Section" "blog") }}
+        <div class="post-item">
+          <span class="post-date">{{ .Date.Format "Jan 02, 2006" }}</span>
+          <span class="hidden sm:inline text-gray-500">:</span>
+          <a href="{{ .RelPermalink }}" class="post-link">{{ .Title }}</a>
+        </div>
+        {{ end }}
+      </div>
+    </div>
+
+    <!-- Projects and Shelf -->
+    <div class="grid">
+      <!-- Recent projects -->
+      <div class="content-section text-left">
+        <div class="flex flex-col sm:items-center mb-4 gap-2">
+          <h2 class="section-title mb-0">Recent projects</h2>
+          <a href="/projects" class="font-serif text-gray-600 hover:text-secondary hover:text-opacity-75 transition-colors duration-200 text-sm italic">All projects →</a>
+        </div>
+        <p class="section-description">Projects I am working on.</p>
+        
+        <div class="space-y-3">
+          {{ $projects := where site.RegularPages "Section" "projects" }}
+          {{ range first 5 $projects }}
+          <div class="post-item">
+            <span class="post-date">{{ .Date.Format "Jan 02, 2006" }}</span>
+            <span class="hidden sm:inline text-gray-500">:</span>
+            <a href="{{ .RelPermalink }}" class="post-link">{{ .Title }}</a>
+          </div>
+          {{ else }}
+          <div class="post-item">
+            <span class="post-date"></span><span class="hidden sm:inline text-gray-500"></span>
+            <a href="#" class="post-link">No projects updated yet.</a>
+
+          </div>
+          {{ end }}
+        </div>
+      </div>
+
+      <!-- Shelf -->
+      <div class="content-section text-left">
+        <div class="flex flex-col sm:items-center mb-4 gap-2">
+          <h2 class="section-title mb-0">From The Shelf</h2>
+          <a href="/shelf" class="font-serif text-gray-600 hover:text-secondary hover:text-opacity-75 transition-colors duration-200 text-sm italic">Full shelf →</a>
+        </div>
+        <p class="section-description text-left">Recent additions and current reads.</p>
+        
+        <div class="space-y-3">
+          {{ $shelfItems := where site.RegularPages "Section" "shelf" }}
+          {{ range first 5 $shelfItems.ByDate.Reverse }}
+            <div class="post-item">
+              <span class="post-date">{{ .Date.Format "Jan 02, 2006" }}</span>
+              <span class="hidden sm:inline text-gray-500">:</span>
+              <a href="{{ .RelPermalink }}" class="post-link">{{ .Title }} <span class="text-xs text-gray-500">({{ .Params.category | title }})</span></a>
+            </div>
+          {{ else }}
+            <div class="post-item">
+                <span class="post-date"></span><span class="hidden sm:inline text-gray-500"></span>
+                <a href="#" class="post-link">No items on the shelf yet.</a>
+            </div>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</div>
 {{ end }}

@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Blogs on My New Hugo Site</title>
+    <title>Blog on thisisamank</title>
     <link>http://localhost:1313/blog/</link>
-    <description>Recent content in Blogs on My New Hugo Site</description>
+    <description>Recent content in Blog on thisisamank</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate></lastBuildDate>
+    <lastBuildDate>Fri, 23 May 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Sealed classes in Dart</title>
+      <link>http://localhost:1313/blog/sealed-classes/</link>
+      <pubDate>Fri, 23 May 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/sealed-classes/</guid>
+      <description>&lt;h1 id=&#34;sealed-classes&#34;&gt;Sealed classes&lt;/h1&gt;&#xA;&lt;p&gt;Sealed classes are very useful when dealing with subtypes. In Dart 3, it will be directly supported in the language. Until then, packages like Freezed has made our lives easier by providing sealed types.&lt;/p&gt;&#xA;&lt;p&gt;In this post, we are going to learn what benifits are there from sealed types and how we can utilize it, in dart with some real life examples.&lt;/p&gt;&#xA;&lt;h3 id=&#34;basics&#34;&gt;Basics&lt;/h3&gt;&#xA;&lt;p&gt;Let’s start off with the basic syntax on how we can declare sealed classes.&lt;/p&gt;</description>
+    </item>
   </channel>
 </rss>

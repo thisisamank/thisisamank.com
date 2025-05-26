@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<title>Sealed classes in Dart | thisisamank</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/main.css?v=1748273365">
+
+
+      <script src="/js/main.js"></script>
+
+
+</head>
+<body>
+  <header>
+    <nav class="flex items-center justify-between px-6 py-6 bg-white">
+  
+  <div class="flex-1"></div>
+  
+  
+  <div class="flex-1 text-center">
+    <a href="/" class="logo-link">thisisamank</a>
+  </div>
+  
+  
+  <div class="flex-1 flex items-center justify-end space-x-8">
+    
+    
+      
+    
+      
+        <a href="/blog/" class="nav-link ">Blog</a>
+      
+    
+      
+        <a href="/shelf/" class="nav-link ">Shelf</a>
+      
+    
+      
+        <a href="/projects/" class="nav-link ">Projects</a>
+      
+    
+      
+        <a href="/about/" class="nav-link ">About</a>
+      
+    
+  </div>
+</nav>
+
+  </header>
+  <main>
+    
+<div class="series-page-container">
+  <div class="max-w-4xl mx-auto px-6 py-12">
+    
+    
+    <div class="series-header">
+      <h1 class="series-page-title">Sealed classes in Dart</h1>
+      <div class="series-description">
+        <h1 id="sealed-classes">Sealed classes</h1>
+<p>Sealed classes are very useful when dealing with subtypes. In Dart 3, it will be directly supported in the language. Until then, packages like Freezed has made our lives easier by providing sealed types.</p>
+<p>In this post, we are going to learn what benifits are there from sealed types and how we can utilize it, in dart with some real life examples.</p>
+<h3 id="basics">Basics</h3>
+<p>Let’s start off with the basic syntax on how we can declare sealed classes.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dart" data-lang="dart"><span style="display:flex;"><span>sealed <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Animal</span> {}
+</span></span></code></pre></div><p>We can create subtypes by just extending this class</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dart" data-lang="dart"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Dog</span> <span style="color:#66d9ef">extends</span> Animal {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Cat</span> <span style="color:#66d9ef">extends</span> Animal {}
+</span></span></code></pre></div><p>switch statements supports <code>exhaustiveness</code> so no subtypes of sealed class are missed.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dart" data-lang="dart"><span style="display:flex;"><span><span style="color:#66d9ef">switch</span>(animal){
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">case</span> Dog()<span style="color:#f92672">:</span> print(<span style="color:#e6db74">&#34;Bark!&#34;</span>);
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">case</span> Cat()<span style="color:#f92672">:</span> print(<span style="color:#e6db74">&#34;Meow&#34;</span>);
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="internals">Internals</h3>
+<p>Sealed classes put two restrictions on us:</p>
+<ul>
+<li>Sealed classes are internally abstract, so we cannot create an object of them.</li>
+<li>We need to declare the subtypes of the sealed class in the same library.</li>
+</ul>
+<p>Due to these constraints, we end up getting two major benefits:</p>
+<ul>
+<li>All the subtypes are easily found and enumerated.</li>
+<li>For <code>exhaustiveness</code>, all the subtypes need to be a child of at least one of the subtypes of the sealed class.</li>
+</ul>
+<h3 id="real-life-example">Real life example</h3>
+<p>Now we are going to see real life examples of how we can use sealed classes in our daily life. We are going to make a todo app with json placeholder api. You can find the source code here.</p>
+<p>To start off, we will make a file <code>endpoints.dart</code> and store the url here.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dart" data-lang="dart"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> todosUrl <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://jsonplaceholder.typicode.com/todos&#39;</span>;
+</span></span></code></pre></div><p>In this section, we will be creating our first sealed class called <code>Either</code>. This class is widely used in basic functional programming, and is used to handle error cases. The <code>Either</code> class is defined as a type that can hold either a successful value or a failure value. This can be useful in situations where there may be multiple error cases, and we want to handle them all in a clean and easy-to-understand way.</p>
+<p>For those who are not familiar with functional programming, <code>Either</code> is a type that represents the concept of choice between two values. It can be used to handle error cases, or to create a choice between two values in a more straightforward manner. If you are interested in learning more about <code>Either</code>, you can read about it <a href="https://codewithandrea.com/articles/functional-error-handling-either-fpdart/">here</a>.</p>
+<p>To implement the <code>Either</code> class, we will not be using any external packages. Instead, we will be implementing it ourselves, and then see how we can use it later on in this blog. This will give us a better understanding of how the <code>Either</code> class works, and how it can be used in different situations.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dart" data-lang="dart"><span style="display:flex;"><span><span style="color:#75715e">/// [Either] is a type that can be either [Left] or [Right].
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">/// It is used to represent a value of one of two possible types (a disjoint union).
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">/// It has two generic type parameters [K] and [V].
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>sealed <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Either</span><span style="color:#f92672">&lt;</span>K, V<span style="color:#f92672">&gt;</span> {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/// [Left] is a type of [Either] that can hold a value of type [K].
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Left</span><span style="color:#f92672">&lt;</span>K, V<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">extends</span> Either<span style="color:#f92672">&lt;</span>K, V<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">final</span> K value;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  Left(<span style="color:#66d9ef">this</span>.value);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/// [Right] is a type of [Either] that can hold a value of type [V].
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Right</span><span style="color:#f92672">&lt;</span>K, V<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">extends</span> Either<span style="color:#f92672">&lt;</span>K, V<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">final</span> V value;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  Right(<span style="color:#66d9ef">this</span>.value);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/// [left] is a helper function that returns an instance of [Left].
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>Either<span style="color:#f92672">&lt;</span>K, V<span style="color:#f92672">&gt;</span> left<span style="color:#f92672">&lt;</span>K, V<span style="color:#f92672">&gt;</span>(K value) <span style="color:#f92672">=&gt;</span> Left(value);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/// [right] is a helper function that returns an instance of [Right].
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>Either<span style="color:#f92672">&lt;</span>K, V<span style="color:#f92672">&gt;</span> right<span style="color:#f92672">&lt;</span>K, V<span style="color:#f92672">&gt;</span>(V value) <span style="color:#f92672">=&gt;</span> Right(value);
+</span></span></code></pre></div><p>We will now create a repository class named <code>TodoRepository</code> that fetches data from the API. It simply makes a <code>GET</code> call, checks for errors (if any), and returns the result as an <code>Either</code> type.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dart" data-lang="dart"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TodoRepository</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">final</span> http.Client client <span style="color:#f92672">=</span> http.Client();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/// Fetch todos from the server. Uses the `http` package.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">/// [Either] type which we created previously is used to handle errors.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">/// [K] is [Failure] and [V] is [List&lt;Todo&gt;].
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  Future<span style="color:#f92672">&lt;</span>Either<span style="color:#f92672">&lt;</span>Failure, List<span style="color:#f92672">&lt;</span>Todo<span style="color:#f92672">&gt;&gt;&gt;</span> fetchTodos() <span style="color:#66d9ef">async</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">final</span> response <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> client.<span style="color:#66d9ef">get</span>(Uri.parse(todosUrl));
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (response.statusCode <span style="color:#f92672">==</span> <span style="color:#ae81ff">200</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">final</span> todos <span style="color:#f92672">=</span> (json.decode(response.body) <span style="color:#f92672">as</span> List)
+</span></span><span style="display:flex;"><span>            .map((e) <span style="color:#f92672">=&gt;</span> Todo.fromJson(json.encode(e)))
+</span></span><span style="display:flex;"><span>            .toList();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> right(todos);
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> left(Failure(<span style="color:#e6db74">&#34;Couldn&#39;t find the todo&#34;</span>));
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    } on SocketException {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> left(Failure(<span style="color:#e6db74">&#34;No Internet Connection&#34;</span>));
+</span></span><span style="display:flex;"><span>    } on HttpException {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> left(Failure(<span style="color:#e6db74">&#34;Couldn&#39;t find the todo&#34;</span>));
+</span></span><span style="display:flex;"><span>    } on FormatException {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> left(Failure(<span style="color:#e6db74">&#34;Bad response format&#34;</span>));
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">catch</span> (e) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> left(Failure(e.toString()));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This outlines how we&rsquo;ll fetch data from the internet. Next, we&rsquo;ll create notifiers to emit the appropriate state. We&rsquo;ll be implementing a functionality similar to Riverpod&rsquo;s <code>[AsyncValue](https://pub.dev/documentation/riverpod/latest/riverpod/AsyncValue-class.html)</code>, which is a utility for safely manipulating asynchronous data. However, we&rsquo;ll be doing so without using Riverpod.</p>
+<p>Our custom class, <code>FutureValue</code>, will serve the same purpose and ensure we don&rsquo;t miss any possible state of an asynchronous operation through <code>exhaustiveness</code> in switch cases.</p>
+<p>Our <code>FutureValue</code> class looks like this</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dart" data-lang="dart"><span style="display:flex;"><span><span style="color:#75715e">/// FutureValue is a sealed class that can be used to represent the state of a
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">/// Future. It has three subtypes: [Loading], [Success], and [Error].
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>sealed <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">FutureValues</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/// [Loading] is used to repsent the state of a Future when it is in progress.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Loading</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">extends</span> FutureValues<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/// [Success] is used to repsent the state of a Future when it is completed
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Success</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">extends</span> FutureValues<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">final</span> T value;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  Success(<span style="color:#66d9ef">this</span>.value);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/// [Error] is used to repsent the state of a Future when it has failed.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Error</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">extends</span> FutureValues<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">String</span> message;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  Error(<span style="color:#66d9ef">this</span>.message);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Now let’s write the <code>notifier</code> which will be responsible for managing the state of our request.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dart" data-lang="dart"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TodoNotifier</span> <span style="color:#66d9ef">extends</span> ValueNotifier<span style="color:#f92672">&lt;</span>FutureValues<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/// Inject [TodoRepository] in the constructor.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">/// calls [super] with [Loading] as the initial value.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  TodoNotifier(<span style="color:#66d9ef">this</span>._todoRepository) <span style="color:#f92672">:</span> <span style="color:#66d9ef">super</span>(Loading());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">final</span> TodoRepository _todoRepository;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/// Fetch todos from the repository.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">/// [Either] type which we created previously is used to handle errors.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">/// changes [value] to [Loading] when the request is in progress.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">/// changes [value] to [Success] with the list of todos when the request is successful.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">/// changes [value] to [Error] with the error message when the request fails.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">void</span> getTodos() <span style="color:#66d9ef">async</span> {
+</span></span><span style="display:flex;"><span>    value <span style="color:#f92672">=</span> Loading();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">final</span> todoStatus <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> _todoRepository.fetchTodos();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">switch</span> (todoStatus) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">case</span> Right()<span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>        value <span style="color:#f92672">=</span> Success(todoStatus.value);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">case</span> Left()<span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>        value <span style="color:#f92672">=</span> Error(todoStatus.value.message);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>With this, our data part of the app is completed. All we need now is a UI to display the list of todo. Let’s create a class called <code>TodoScreen</code> and use <code>TodoNotifier</code> to show all the todos.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dart" data-lang="dart"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TodoScreen</span> <span style="color:#66d9ef">extends</span> StatefulWidget {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> TodoScreen({<span style="color:#66d9ef">super</span>.key});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">@</span>override
+</span></span><span style="display:flex;"><span>  State<span style="color:#f92672">&lt;</span>TodoScreen<span style="color:#f92672">&gt;</span> createState() <span style="color:#f92672">=&gt;</span> _TodoScreenState();
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">_TodoScreenState</span> <span style="color:#66d9ef">extends</span> State<span style="color:#f92672">&lt;</span>TodoScreen<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">final</span> _todoNotifier <span style="color:#f92672">=</span> TodoNotifier(TodoRepository());
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">@</span>override
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">void</span> initState() {
+</span></span><span style="display:flex;"><span>    _todoNotifier.getTodos();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">super</span>.initState();
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">@</span>override
+</span></span><span style="display:flex;"><span>  Widget build(BuildContext context) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> Scaffold(
+</span></span><span style="display:flex;"><span>      appBar: AppBar(
+</span></span><span style="display:flex;"><span>        title: <span style="color:#66d9ef">const</span> Text(<span style="color:#e6db74">&#34;Dart 3 : Todo app&#34;</span>),
+</span></span><span style="display:flex;"><span>      ),
+</span></span><span style="display:flex;"><span>      body: ValueListenableBuilder<span style="color:#f92672">&lt;</span>FutureValues<span style="color:#f92672">&lt;</span>List<span style="color:#f92672">&lt;</span>Todo<span style="color:#f92672">&gt;&gt;&gt;</span>(
+</span></span><span style="display:flex;"><span>          valueListenable: _todoNotifier,
+</span></span><span style="display:flex;"><span>          builder: (context, value, child) {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// switch will automatically ask you to cover all the cases of [FutureValues]
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#66d9ef">switch</span> (value) {
+</span></span><span style="display:flex;"><span>              <span style="color:#75715e">// This is how we can use pattern matching in Dart, will be covered in coming blogs.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>              <span style="color:#75715e">// Loading() =&gt; _buildLoading(),
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>              <span style="color:#75715e">// Error(message: var error) =&gt; _buildError(error),
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>              <span style="color:#75715e">// Success(value: var value) =&gt; _buildSuccess(value),
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>              <span style="color:#66d9ef">case</span> Loading()<span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> _buildLoading();
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">case</span> Error()<span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> _buildError(value.message);
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">case</span> Success()<span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> _buildSuccess(value.value);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>          }),
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  Widget _buildLoading() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">const</span> Center(
+</span></span><span style="display:flex;"><span>      child: CircularProgressIndicator(),
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  Widget _buildError(<span style="color:#66d9ef">String</span> message) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> Center(
+</span></span><span style="display:flex;"><span>      child: Text(message),
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  Widget _buildSuccess(List<span style="color:#f92672">&lt;</span>Todo<span style="color:#f92672">&gt;</span> todos) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> ListView.builder(
+</span></span><span style="display:flex;"><span>      itemCount: todos.length,
+</span></span><span style="display:flex;"><span>      itemBuilder: (context, index) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ListTile(
+</span></span><span style="display:flex;"><span>          title: Text(
+</span></span><span style="display:flex;"><span>            todos[index].title,
+</span></span><span style="display:flex;"><span>            style: TextStyle(
+</span></span><span style="display:flex;"><span>              decoration: todos[index].completed
+</span></span><span style="display:flex;"><span>                  <span style="color:#f92672">?</span> TextDecoration.lineThrough
+</span></span><span style="display:flex;"><span>                  <span style="color:#f92672">:</span> TextDecoration.none,
+</span></span><span style="display:flex;"><span>              color: todos[index].completed <span style="color:#f92672">?</span> Colors.green <span style="color:#f92672">:</span> Colors.black,
+</span></span><span style="display:flex;"><span>            ),
+</span></span><span style="display:flex;"><span>          ),
+</span></span><span style="display:flex;"><span>        );
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>With this, we come to the end of the blog and we have covered how to create <code>sealed</code> classes in dart and how to use them. We also covered some examples on how it can be used in real life.</p>
+
+      </div>
+    </div>
+    
+    
+    <section class="series-posts-section">
+      <div class="series-posts-list">
+        
+      </div>
+    </section>
+    
+    
+    <div class="back-link">
+      <a href="/blog" class="back-to-blog">← Back to Blog</a>
+    </div>
+    
+  </div>
+</div>
+
+  </main>
+</body>
+</html>

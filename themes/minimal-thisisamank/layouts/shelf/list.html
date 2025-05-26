@@ -1,0 +1,60 @@
+{{ define "main" }}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <header class="page-header mb-12">
+    <h1 class="page-title">{{ .Title }}</h1>
+    {{ with .Content }}
+      <div class="font-serif text-gray-600 leading-relaxed text-center max-w-2xl mx-auto mt-2">{{ . }}</div>
+    {{ end }}
+  </header>
+
+  {{ $shelfRoot := site.GetPage "/shelf" }}
+  {{ $shelfCategories := $shelfRoot.Sections }}
+
+  <div class="space-y-10">
+    {{ range $shelfCategories }}
+      <section class="shelf-category-group">
+        <!-- Dark Category Header -->
+        <div class="text-white p-4 rounded-t-md">
+          <h2 class="text-xl font-sans font-semibold">{{ .Title }}</h2>
+          {{ with .Content }}
+            <p class="text-sm font-serif text-gray-300 mt-1">{{ . }}</p>
+          {{ end }}
+        </div>
+
+        <!-- Items List (no distinct background) -->
+        <div class="rounded-b-md">
+          {{ $items := .RegularPages.ByDate.Reverse }}
+          {{ if $items }}
+            <ul class="divide-y divide-gray-200">
+              {{ range $items }}
+                <li class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors duration-150">
+                  <span class="text-md font-sans text-gray-700">{{ .Title }}</span>
+                  <div>
+                    {{ if .Params.link }}
+                      <a href="{{ .Params.link }}" target="_blank" rel="noopener noreferrer" 
+                         class="text-sm font-sans font-medium text-secondary hover:text-opacity-75 transition-colors duration-200">
+                        {{ if eq .Params.category "courses" }}View{{ else }}Read{{ end }}
+                      </a>
+                    {{ else }}
+                       <a href="{{ .RelPermalink }}" 
+                         class="text-sm font-sans font-medium text-secondary hover:text-opacity-75 transition-colors duration-200">
+                        Details
+                      </a>
+                    {{ end }}
+                  </div>
+                </li>
+              {{ end }}
+            </ul>
+          {{ else }}
+            <p class="px-4 py-3 sm:px-6 text-sm text-gray-500 italic">No items in this category yet.</p>
+          {{ end }}
+        </div>
+      </section>
+    {{ else }}
+      <p class="text-center italic text-gray-500 py-10">No categories found in the shelf.</p>
+    {{ end }}
+  </div>
+
+</div>
+{{ end }} 
