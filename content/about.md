@@ -4,7 +4,7 @@ date: 2025-05-23
 draft: false
 ---
 
-Welcome to my personal website. I'm a systems engineer at Cloudflare and I am passionate about building scalable, reliable systems and sharing what I learn along the way.
+Welcome to my personal website. I am passionate about building scalable, reliable systems and sharing what I learn along the way.
 
 This site is a collection of my thoughts, learnings, and projects. You'll find technical blog posts organized into series, and details about the projects I'm working on.
 

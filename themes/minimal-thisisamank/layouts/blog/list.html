@@ -14,6 +14,7 @@
       {{ range .Sections }}
       <div class="series-item">
         <h3 class="series-title">{{ .Title }}</h3>
+        <p class="series-description text-gray-500 text-sm mb-4 italic">{{ .Params.description }}</p>
         <div class="space-y-2">
           {{ range .RegularPages.ByDate.Reverse }}
           <div class="post-item">
